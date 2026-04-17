@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Maps Expert Review Extractor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Curated Ratings</h1>
+      <p class="subtitle">Filter out noise by aggregating reviews only from experienced Local Guides.</p>
+    </header>
+
+    <div class="controls">
+      <div class="input-group">
+        <label for="max-scrolls">Max Scroll Iterations</label>
+        <input type="number" id="max-scrolls" value="10" min="1" max="100">
+        <small>Higher = loads more reviews, takes longer. Usually ~10 reviews loaded per scroll.</small>
+      </div>
+      <button id="extract-btn" class="primary-btn">Extract & Recalculate</button>
+      <div id="status">Ready</div>
+    </div>
+
+    <div id="results" class="hidden">
+      <div class="rating-box">
+        <span class="rating-label">Curated Rating</span>
+        <div class="rating-score"><span id="new-rating">-</span> <small>/ 5.0</small></div>
+        <div class="rating-meta">Based on the top 30 reviewers</div>
+      </div>
+      
+      <div class="actions">
+        <button id="export-btn" class="secondary-btn">Export to CSV</button>
+      </div>
+
+      <div class="reviews-list-container">
+        <h3>Expert Reviews Used</h3>
+        <ul id="reviews-list"></ul>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

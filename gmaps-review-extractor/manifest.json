@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Maps Expert Review Extractor",
+  "version": "1.0",
+  "description": "Extracts top reviews from users with the most contributions and recalculates a curated rating.",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup/index.html"
+  },
+  "host_permissions": [
+    "https://www.google.com/*",
+    "https://www.google.com/maps/*"
+  ]
+}
