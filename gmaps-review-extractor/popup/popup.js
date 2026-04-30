@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const extractBtn = document.getElementById('extract-btn');
     const exportBtn = document.getElementById('export-btn');
-    const maxScrollsInput = document.getElementById('max-scrolls');
     const statusEl = document.getElementById('status');
     const resultsEl = document.getElementById('results');
     const newRatingEl = document.getElementById('new-rating');
@@ -10,11 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let extractedTopReviews = [];
   
     extractBtn.addEventListener('click', async () => {
-      const maxScrolls = parseInt(maxScrollsInput.value, 10);
-      if (isNaN(maxScrolls) || maxScrolls < 1) {
-        alert("Please enter a valid number of scrolls");
-        return;
-      }
+      const maxScrolls = 50;
   
       try {
         let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -48,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
   
           if (response && response.reviews) {
-            statusEl.textContent = `Found ${response.reviews.length} total reviews. Rating compiled!`;
             processData(response.reviews);
           }
         });
@@ -80,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.removeChild(a);
     });
   
-    function processData(reviews) {
+    async function processData(reviews) {
       if (reviews.length === 0) {
         statusEl.textContent = "No valid reviews found.";
         return;
@@ -91,6 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
   
       // Get top 30
       extractedTopReviews = reviews.slice(0, 30);
+
+      statusEl.textContent = "Translating reviews... Please wait.";
+      for (let r of extractedTopReviews) {
+          r.text = await translateTextToEnglish(r.text);
+      }
+      statusEl.textContent = `Found ${reviews.length} total reviews. Rating compiled!`;
   
       // Calculate average rating
       const totalRating = extractedTopReviews.reduce((sum, r) => sum + r.rating, 0);
@@ -129,5 +129,28 @@ document.addEventListener('DOMContentLoaded', () => {
             '"': '&quot;'
           }[tag] || tag)
       );
+    }
+
+    async function translateTextToEnglish(text) {
+      if (!text || text.trim() === '') return text;
+      try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        let translatedText = '';
+        if (data && data[0]) {
+          for (let part of data[0]) {
+            if (part[0]) {
+              translatedText += part[0];
+            }
+          }
+          return translatedText;
+        }
+        return text;
+      } catch (error) {
+        console.error("Translation error:", error);
+        return text;
+      }
     }
   });
